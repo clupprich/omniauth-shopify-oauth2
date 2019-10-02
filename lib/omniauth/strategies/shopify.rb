@@ -24,16 +24,14 @@ module OmniAuth
       option :per_user_permissions, false
 
       option :setup, proc { |env|
-        strategy = env['omniauth.strategy']
-
-        shopify_auth_params = strategy.session['shopify.omniauth_params'] && strategy.session['shopify.omniauth_params'].with_indifferent_access
-        shop = if shopify_auth_params && shopify_auth_params['shop']
-          "https://#{shopify_auth_params['shop']}"
+        request = Rack::Request.new(env)
+        site = if request.params['shop']
+          "https://#{request.params['shop']}"
         else
           ''
         end
 
-        strategy.options[:client_options][:site] = shop
+        env['omniauth.strategy'].options[:client_options][:site] = site
       }
 
       uid { URI.parse(options[:client_options][:site]).host }

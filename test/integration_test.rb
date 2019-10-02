@@ -134,10 +134,7 @@ class IntegrationTest < Minitest::Test
 
     response = request.get("https://app.example.com/auth/shopify/callback?#{Rack::Utils.build_query(params)}",
                            input: body,
-                           "CONTENT_TYPE" => 'application/x-www-form-urlencoded',
-                           'rack.session' => {
-                              'shopify.omniauth_params' => { shop: 'snowdevil.myshopify.com' }
-                            })
+                           "CONTENT_TYPE" => 'application/x-www-form-urlencoded')
 
     assert_auth_failure(response, 'invalid_signature')
   end
@@ -391,12 +388,11 @@ class IntegrationTest < Minitest::Test
   end
 
   def authorize(shop)
-    @opts['rack.session']['shopify.omniauth_params'] = { shop: shop }
+    @opts[:params] = { shop: shop }
     request.get('https://app.example.com/auth/shopify', opts)
   end
 
   def callback(params)
-    @opts['rack.session']['shopify.omniauth_params'] = { shop: shop }
     request.get("https://app.example.com/auth/shopify/callback?#{Rack::Utils.build_query(params)}", opts)
   end
 
